@@ -5,7 +5,7 @@ import UserMenu from '@/components/layout/UserMenu'
 
 export default async function Header() {
   const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
 
   return (
     <header className="sticky top-0 z-50 bg-primary shadow-md">
@@ -20,7 +20,7 @@ export default async function Header() {
           </span>
         </Link>
 
-        {user && <UserMenu email={user.email ?? ''} />}
+        {session?.user && <UserMenu email={session.user.email ?? ''} />}
       </div>
     </header>
   )
