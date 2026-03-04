@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Layers, GitBranch, HelpCircle } from 'lucide-react'
 import FlashcardGrid from '@/components/fiche/FlashcardGrid'
 import SchemaView from '@/components/fiche/SchemaView'
@@ -21,8 +22,20 @@ const TABS: { key: TabKey; label: string; icon: typeof Layers }[] = [
   { key: 'quiz', label: 'Quiz', icon: HelpCircle },
 ]
 
-export default function FicheTabs({ flashcards, schema, questions }: FicheTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabKey>('flashcards')
+const VALID_TABS = new Set<string>(['flashcards', 'schema', 'quiz'])
+
+function FicheTabsInner({ flashcards, schema, questions }: FicheTabsProps) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  const tabParam = searchParams.get('tab')
+  const activeTab: TabKey = tabParam && VALID_TABS.has(tabParam) ? (tabParam as TabKey) : 'flashcards'
+
+  function setActiveTab(tab: TabKey) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('tab', tab)
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
 
   return (
     <div>
@@ -36,7 +49,7 @@ export default function FicheTabs({ flashcards, schema, questions }: FicheTabsPr
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
+              className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all cursor-pointer ${
                 isActive
                   ? 'bg-primary text-white shadow-sm'
                   : 'text-muted hover:bg-gray-200 hover:text-foreground'
@@ -56,5 +69,13 @@ export default function FicheTabs({ flashcards, schema, questions }: FicheTabsPr
         {activeTab === 'quiz' && <QuizPlayer questions={questions} />}
       </div>
     </div>
+  )
+}
+
+export default function FicheTabs(props: FicheTabsProps) {
+  return (
+    <Suspense>
+      <FicheTabsInner {...props} />
+    </Suspense>
   )
 }
