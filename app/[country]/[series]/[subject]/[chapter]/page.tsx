@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { Lock, Unlock, BookOpen } from 'lucide-react'
@@ -61,6 +62,10 @@ export default async function ChapterPage({ params }: PageProps) {
     .order('display_order')
 
   const ficheList = fiches ?? []
+
+  if (ficheList.length === 1) {
+    redirect(`/${countrySlug}/${seriesSlug}/${subjectSlug}/${chapterSlug}/${ficheList[0].slug}`)
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
