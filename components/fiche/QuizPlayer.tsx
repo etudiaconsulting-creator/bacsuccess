@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Lightbulb } from 'lucide-react'
+import { useState, useCallback } from 'react'
+import { Lightbulb, HelpCircle } from 'lucide-react'
 import type { QuizQuestion } from '@/lib/supabase/types'
 import FormulaText from '@/components/ui/FormulaText'
 
@@ -23,15 +23,37 @@ function getScoreColor(percentage: number): string {
   return 'text-red-500'
 }
 
+/** Fisher-Yates shuffle for questions and their options */
+function shuffleQuestions(questions: QuizQuestion[]): QuizQuestion[] {
+  const arr = [...questions]
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr.map((q) => {
+    const indices = q.options.map((_, i) => i)
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]]
+    }
+    return {
+      ...q,
+      options: indices.map((i) => q.options[i]),
+      correct: indices.indexOf(q.correct),
+    }
+  })
+}
+
 export default function QuizPlayer({ questions }: QuizPlayerProps) {
+  const [shuffledQuestions, setShuffledQuestions] = useState(() => shuffleQuestions(questions))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showResult, setShowResult] = useState(false)
   const [score, setScore] = useState(0)
   const [isFinished, setIsFinished] = useState(false)
 
-  const totalQuestions = questions.length
-  const currentQuestion = questions[currentIndex]
+  const totalQuestions = shuffledQuestions.length
+  const currentQuestion = shuffledQuestions[currentIndex]
   const progress = ((currentIndex + (isFinished ? 1 : 0)) / totalQuestions) * 100
   const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0
 
@@ -56,13 +78,14 @@ export default function QuizPlayer({ questions }: QuizPlayerProps) {
     }
   }
 
-  function handleRestart() {
+  const handleRestart = useCallback(() => {
+    setShuffledQuestions(shuffleQuestions(questions))
     setCurrentIndex(0)
     setSelectedAnswer(null)
     setShowResult(false)
     setScore(0)
     setIsFinished(false)
-  }
+  }, [questions])
 
   function getButtonStyle(optionIndex: number): string {
     const base =
@@ -81,6 +104,15 @@ export default function QuizPlayer({ questions }: QuizPlayerProps) {
     }
 
     return `${base} border-gray-200 bg-gray-50 text-muted`
+  }
+
+  if (totalQuestions === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center">
+        <HelpCircle className="mb-4 h-12 w-12 text-muted" />
+        <h2 className="text-lg font-semibold text-foreground">Le quiz est en cours de préparation !</h2>
+      </div>
+    )
   }
 
   // Score screen
