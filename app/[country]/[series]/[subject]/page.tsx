@@ -1,0 +1,188 @@
+import Link from 'next/link'
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { FileText, ArrowRight } from 'lucide-react'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import Breadcrumb from '@/components/layout/Breadcrumb'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
+
+interface PageProps {
+  params: Promise<{ country: string; series: string; subject: string }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { country: countrySlug, series: seriesSlug, subject: subjectSlug } = await params
+  const supabase = await createServerSupabaseClient()
+
+  const { data: country } = await supabase
+    .from('countries')
+    .select('name')
+    .eq('slug', countrySlug)
+    .single()
+
+  const { data: series } = await supabase
+    .from('series')
+    .select('short_name')
+    .eq('slug', seriesSlug)
+    .single()
+
+  const { data: subject } = await supabase
+    .from('subjects')
+    .select('name')
+    .eq('slug', subjectSlug)
+    .single()
+
+  if (!country || !series || !subject) {
+    return { title: 'Non trouvé - BacSuccess' }
+  }
+
+  return {
+    title: `${subject.name} - ${series.short_name} | BacSuccess ${country.name}`,
+    description: `Chapitres de ${subject.name} pour la série ${series.short_name}. Fiches de révision, quiz et schémas pour le baccalauréat ${country.name}.`,
+  }
+}
+
+export default async function SubjectPage({ params }: PageProps) {
+  const { country: countrySlug, series: seriesSlug, subject: subjectSlug } = await params
+  const supabase = await createServerSupabaseClient()
+
+  const { data: country } = await supabase
+    .from('countries')
+    .select('*')
+    .eq('slug', countrySlug)
+    .single()
+
+  if (!country) {
+    notFound()
+  }
+
+  const { data: series } = await supabase
+    .from('series')
+    .select('*')
+    .eq('slug', seriesSlug)
+    .eq('country_id', country.id)
+    .single()
+
+  if (!series) {
+    notFound()
+  }
+
+  const { data: subject } = await supabase
+    .from('subjects')
+    .select('*')
+    .eq('slug', subjectSlug)
+    .eq('series_id', series.id)
+    .single()
+
+  if (!subject) {
+    notFound()
+  }
+
+  const { data: chapters } = await supabase
+    .from('chapters')
+    .select('*')
+    .eq('subject_id', subject.id)
+    .order('number')
+
+  const chapterList = chapters ?? []
+
+  // Fetch fiche counts for each chapter
+  const chaptersWithCounts = await Promise.all(
+    chapterList.map(async (chapter) => {
+      const { count } = await supabase
+        .from('fiches')
+        .select('*', { count: 'exact', head: true })
+        .eq('chapter_id', chapter.id)
+        .eq('is_published', true)
+
+      return {
+        ...chapter,
+        ficheCount: count ?? 0,
+      }
+    })
+  )
+
+  const subjectColor = subject.color ? getSubjectColor(subject.color) : '#6B7280'
+
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <Header />
+
+      <main className="flex-1">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <Breadcrumb
+            items={[
+              { label: country.name, href: `/${countrySlug}` },
+              { label: series.short_name, href: `/${countrySlug}/${seriesSlug}` },
+              { label: subject.name },
+            ]}
+          />
+
+          <div className="py-8">
+            <div className="flex items-center gap-3">
+              <div
+                className="h-8 w-1.5 rounded-full"
+                style={{ backgroundColor: subjectColor }}
+              />
+              <h1 className="font-serif text-2xl font-bold text-foreground sm:text-3xl">
+                {subject.name}
+              </h1>
+            </div>
+            <p className="mt-2 text-muted">
+              {chaptersWithCounts.length} chapitre{chaptersWithCounts.length !== 1 ? 's' : ''} disponible{chaptersWithCounts.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4 pb-12">
+            {chaptersWithCounts.map((chapter) => (
+              <Link
+                key={chapter.id}
+                href={`/${countrySlug}/${seriesSlug}/${subjectSlug}/${chapter.slug}`}
+                className="group flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-primary hover:shadow-md"
+              >
+                <div
+                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg font-bold text-white"
+                  style={{ backgroundColor: subjectColor }}
+                >
+                  {chapter.number}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="font-semibold text-foreground group-hover:text-primary">
+                    {chapter.title}
+                  </h2>
+                  {chapter.description && (
+                    <p className="mt-1 text-sm text-muted line-clamp-2">
+                      {chapter.description}
+                    </p>
+                  )}
+                  <div className="mt-2 flex items-center gap-1 text-xs text-muted">
+                    <FileText className="h-3.5 w-3.5" />
+                    <span>{chapter.ficheCount} fiche{chapter.ficheCount !== 1 ? 's' : ''}</span>
+                  </div>
+                </div>
+                <ArrowRight className="h-5 w-5 flex-shrink-0 text-muted transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  )
+}
+
+function getSubjectColor(colorKey: string): string {
+  const colors: Record<string, string> = {
+    eco: '#2563EB',
+    compta: '#059669',
+    philo: '#7C3AED',
+    droit: '#DC2626',
+    maths: '#EA580C',
+    francais: '#0891B2',
+    histgeo: '#CA8A04',
+    anglais: '#4F46E5',
+  }
+  return colors[colorKey] ?? '#6B7280'
+}

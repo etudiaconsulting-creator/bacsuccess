@@ -1,0 +1,27 @@
+import Link from 'next/link'
+import { GraduationCap } from 'lucide-react'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
+import UserMenu from '@/components/layout/UserMenu'
+
+export default async function Header() {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  return (
+    <header className="sticky top-0 z-50 bg-primary shadow-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        <Link href="/" className="flex items-center gap-2">
+          <GraduationCap className="h-7 w-7 text-secondary" />
+          <span className="font-serif text-xl font-bold text-white sm:text-2xl">
+            BacSuccess
+          </span>
+          <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-primary">
+            Beta
+          </span>
+        </Link>
+
+        {user && <UserMenu email={user.email ?? ''} />}
+      </div>
+    </header>
+  )
+}

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install @supabase/supabase-js @supabase/ssr lucide-react)",
+      "Bash(npx tsc --noEmit --pretty components/layout/Header.tsx components/layout/Breadcrumb.tsx components/layout/Footer.tsx)",
+      "Bash(npm run build)",
+      "Bash(node -e \":*)",
+      "Bash(npx supabase db push --help)",
+      "Bash(npx supabase init --with-intellij-settings=false --force)",
+      "Bash(npx supabase db push --db-url \"postgresql://postgres.cxqpymuimljadznerayd:-MOhamedFAdma123%2B@aws-0-eu-west-3.pooler.supabase.com:6543/postgres\" --include-all)",
+      "Bash(npx next build)",
+      "Bash(python3 fix_accents.py)",
+      "Bash(python3 -c \":*)"
+    ]
+  }
+}
