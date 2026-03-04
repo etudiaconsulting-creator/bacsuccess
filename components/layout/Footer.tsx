@@ -15,7 +15,7 @@ export default function Footer() {
             Plateforme de révision pour le baccalauréat africain
           </p>
           <div className="mt-2 text-xs text-gray-400">
-            &copy; 2024 BacSuccess. Tous droits réservés.
+            &copy; {new Date().getFullYear()} BacSuccess. Tous droits réservés.
           </div>
         </div>
       </div>
