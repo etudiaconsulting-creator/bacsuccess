@@ -16,7 +16,30 @@ const merriweather = Merriweather({
 export const metadata: Metadata = {
   title: "BacSuccess - Réussis ton Bac",
   description:
-    "Plateforme de révision pour le baccalauréat africain. Fiches, quiz et schémas pour réussir ton Bac.",
+    "Plateforme gratuite de révision pour le baccalauréat africain. Fiches, quiz et schémas pour réussir ton Bac.",
+  openGraph: {
+    title: "BacSuccess - Réussis ton Bac. Point final.",
+    description:
+      "Plateforme gratuite de révision pour le baccalauréat africain. Fiches interactives, quiz et schémas de synthèse.",
+    url: "https://bacsuccess.vercel.app",
+    siteName: "BacSuccess",
+    locale: "fr_FR",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "BacSuccess - Réussis ton Bac",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BacSuccess - Réussis ton Bac. Point final.",
+    description:
+      "Plateforme gratuite de révision pour le baccalauréat africain.",
+  },
 };
 
 export default function RootLayout({
