@@ -36,6 +36,7 @@ export async function updateSession(request: NextRequest) {
     pathname === '/' ||
     pathname === '/login' ||
     pathname === '/signup' ||
+    pathname === '/a-propos' ||
     pathname.startsWith('/auth/')
 
   // Browse routes — country and series pages are public (no auth required)
