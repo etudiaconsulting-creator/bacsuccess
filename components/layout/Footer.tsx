@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 
 export default function Footer() {
@@ -14,6 +15,12 @@ export default function Footer() {
           <p className="max-w-md text-sm text-gray-300">
             Plateforme de révision pour le baccalauréat africain
           </p>
+          <Link
+            href="/a-propos"
+            className="text-sm text-gray-300 underline-offset-2 hover:text-white hover:underline"
+          >
+            À propos
+          </Link>
           <div className="mt-2 text-xs text-gray-400">
             &copy; {new Date().getFullYear()} BacSuccess. Tous droits réservés.
           </div>
