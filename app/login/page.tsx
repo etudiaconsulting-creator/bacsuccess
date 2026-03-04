@@ -34,8 +34,9 @@ function LoginForm() {
       return
     }
 
-    const redirectTo = searchParams.get('redirect') || '/'
-    router.push(redirectTo)
+    const redirect = searchParams.get('redirect')
+    const safeDest = redirect && redirect.startsWith('/') ? redirect : '/'
+    router.push(safeDest)
     router.refresh()
   }
 

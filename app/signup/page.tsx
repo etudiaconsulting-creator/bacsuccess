@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import AuthLayout from '@/components/auth/AuthLayout'
 
-export default function SignupPage() {
+function SignupForm() {
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -19,12 +21,16 @@ export default function SignupPage() {
     setLoading(true)
     setError(null)
 
+    const redirect = searchParams.get('redirect')
+    const safeRedirect = redirect && redirect.startsWith('/') ? redirect : '/'
+    const confirmUrl = `${window.location.origin}/auth/confirm?next=${encodeURIComponent(safeRedirect)}`
+
     const supabase = createClient()
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        emailRedirectTo: confirmUrl,
       },
     })
 
@@ -139,5 +145,13 @@ export default function SignupPage() {
         </Link>
       </p>
     </AuthLayout>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
   )
 }
