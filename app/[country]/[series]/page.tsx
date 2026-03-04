@@ -16,7 +16,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { resolveCountry, resolveSeries } from '@/lib/data/resolvers'
+import { resolveFullPath } from '@/lib/data/resolvers'
 
 const ICON_MAP: Record<string, LucideIcon> = {
   TrendingUp,
@@ -73,10 +73,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function DashboardPage({ params }: PageProps) {
   const { country: countrySlug, series: seriesSlug } = await params
 
-  const country = await resolveCountry(countrySlug)
-  const series = await resolveSeries(country.id, seriesSlug)
-
-  const supabase = await createServerSupabaseClient()
+  const { country, series, supabase } = await resolveFullPath({ country: countrySlug, series: seriesSlug })
   const { data: subjectsRaw } = await supabase
     .rpc('get_subjects_with_counts', { p_series_id: series.id })
 

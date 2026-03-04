@@ -4,7 +4,7 @@ import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
 import FicheTabs from '@/components/fiche/FicheTabs'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { resolveCountry, resolveSeries, resolveSubject, resolveChapter, resolveFiche } from '@/lib/data/resolvers'
+import { resolveFullPath } from '@/lib/data/resolvers'
 
 interface PageProps {
   params: Promise<{
@@ -74,11 +74,7 @@ export default async function FichePage({ params }: PageProps) {
     fiche: ficheSlug,
   } = await params
 
-  const country = await resolveCountry(countrySlug)
-  const series = await resolveSeries(country.id, seriesSlug)
-  const subject = await resolveSubject(series.id, subjectSlug)
-  const chapter = await resolveChapter(subject.id, chapterSlug)
-  const fiche = await resolveFiche(chapter.id, ficheSlug)
+  const { country, series, subject, chapter, fiche } = await resolveFullPath({ country: countrySlug, series: seriesSlug, subject: subjectSlug, chapter: chapterSlug, fiche: ficheSlug })
 
   const { flashcards, schema, quiz } = fiche.content
 

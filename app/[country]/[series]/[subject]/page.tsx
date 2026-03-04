@@ -5,7 +5,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { resolveCountry, resolveSeries, resolveSubject } from '@/lib/data/resolvers'
+import { resolveFullPath } from '@/lib/data/resolvers'
 
 interface PageProps {
   params: Promise<{ country: string; series: string; subject: string }>
@@ -46,11 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function SubjectPage({ params }: PageProps) {
   const { country: countrySlug, series: seriesSlug, subject: subjectSlug } = await params
 
-  const country = await resolveCountry(countrySlug)
-  const series = await resolveSeries(country.id, seriesSlug)
-  const subject = await resolveSubject(series.id, subjectSlug)
-
-  const supabase = await createServerSupabaseClient()
+  const { country, series, subject, supabase } = await resolveFullPath({ country: countrySlug, series: seriesSlug, subject: subjectSlug })
   const { data: chaptersRaw } = await supabase
     .rpc('get_chapters_with_counts', { p_subject_id: subject.id })
 
