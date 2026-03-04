@@ -8,8 +8,8 @@ export interface Flashcard {
 export interface SchemaNode {
   id: string
   label: string
-  x: number
-  y: number
+  x?: number
+  y?: number
   type: 'main' | 'branch' | 'leaf'
 }
 
