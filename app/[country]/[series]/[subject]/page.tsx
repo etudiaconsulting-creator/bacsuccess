@@ -175,6 +175,9 @@ function getSubjectColor(colorKey: string): string {
     chimie: '#7C3AED',
     ecm: '#CA8A04',
     eps: '#EA580C',
+    sociologie: '#8B5CF6',
+    histoire: '#B45309',
+    geographie: '#059669',
   }
   return colors[colorKey] ?? '#6B7280'
 }

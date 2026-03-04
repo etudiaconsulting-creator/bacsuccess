@@ -17,6 +17,9 @@ import {
   Dumbbell,
   PenLine,
   Compass,
+  Users,
+  ScrollText,
+  Globe2,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import Header from '@/components/layout/Header'
@@ -43,6 +46,9 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Dumbbell,
   PenLine,
   Compass,
+  Users,
+  ScrollText,
+  Globe2,
 }
 
 const SUBJECT_COLORS: Record<string, string> = {
@@ -59,6 +65,9 @@ const SUBJECT_COLORS: Record<string, string> = {
   chimie: '#7C3AED',
   ecm: '#CA8A04',
   eps: '#EA580C',
+  sociologie: '#8B5CF6',
+  histoire: '#B45309',
+  geographie: '#059669',
 }
 
 interface PageProps {
