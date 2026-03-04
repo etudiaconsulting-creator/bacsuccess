@@ -21,6 +21,7 @@ import {
   ScrollText,
   Globe2,
   Ruler,
+  MessageCircle,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import Header from '@/components/layout/Header'
@@ -51,6 +52,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   ScrollText,
   Globe2,
   Ruler,
+  MessageCircle,
 }
 
 const SUBJECT_COLORS: Record<string, string> = {
@@ -71,6 +73,8 @@ const SUBJECT_COLORS: Record<string, string> = {
   histoire: '#B45309',
   geographie: '#059669',
   dessin: '#6B7280',
+  linguistique: '#EC4899',
+  anglaisLv2: '#6366F1',
 }
 
 interface PageProps {

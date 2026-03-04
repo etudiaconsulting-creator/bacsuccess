@@ -179,6 +179,8 @@ function getSubjectColor(colorKey: string): string {
     histoire: '#B45309',
     geographie: '#059669',
     dessin: '#6B7280',
+    linguistique: '#EC4899',
+    anglaisLv2: '#6366F1',
   }
   return colors[colorKey] ?? '#6B7280'
 }
