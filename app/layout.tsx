@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter, Merriweather } from "next/font/google";
+import ThemeProvider from "@/components/providers/ThemeProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -48,11 +50,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${merriweather.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+        {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
+          <Script
+            src="https://cloud.umami.is/script.js"
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+            strategy="lazyOnload"
+          />
+        )}
       </body>
     </html>
   );

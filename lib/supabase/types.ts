@@ -97,6 +97,18 @@ export interface Fiche {
   updated_at: string
 }
 
+export interface UserProgress {
+  id: string
+  user_id: string
+  fiche_id: string
+  viewed: boolean
+  viewed_at: string | null
+  quiz_score: number | null
+  quiz_taken_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -124,6 +136,11 @@ export interface Database {
         Row: Fiche
         Insert: Omit<Fiche, 'id' | 'created_at' | 'updated_at'> & { id?: string; created_at?: string; updated_at?: string }
         Update: Partial<Omit<Fiche, 'id'>>
+      }
+      user_progress: {
+        Row: UserProgress
+        Insert: Omit<UserProgress, 'id' | 'created_at' | 'updated_at'> & { id?: string; created_at?: string; updated_at?: string }
+        Update: Partial<Omit<UserProgress, 'id'>>
       }
     }
   }

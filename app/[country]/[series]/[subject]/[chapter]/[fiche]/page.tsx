@@ -3,6 +3,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
 import FicheTabs from '@/components/fiche/FicheTabs'
+import FicheTracker from '@/components/fiche/FicheTracker'
 import WhatsAppShareFiche from '@/components/ui/WhatsAppShareFiche'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { resolveFullPath } from '@/lib/data/resolvers'
@@ -82,6 +83,7 @@ export default async function FichePage({ params }: PageProps) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
+      <FicheTracker ficheId={fiche.id} ficheTitle={fiche.title} />
 
       <main className="flex-1">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -113,6 +115,7 @@ export default async function FichePage({ params }: PageProps) {
               schema={schema}
               questions={quiz}
               ficheTitle={fiche.title}
+              ficheId={fiche.id}
             />
           </div>
         </div>

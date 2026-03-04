@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --color-primary: #1B4332;
   --color-primary-light: #2D6A4F;
@@ -16,6 +18,11 @@
   --color-francais: #0891B2;
   --color-histgeo: #CA8A04;
   --color-anglais: #4F46E5;
+  --color-svt: #059669;
+  --color-physique: #2563EB;
+  --color-chimie: #7C3AED;
+  --color-ecm: #CA8A04;
+  --color-eps: #EA580C;
   --font-sans: var(--font-inter);
   --font-serif: var(--font-merriweather);
 }
@@ -24,6 +31,123 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Dark mode overrides */
+.dark {
+  --color-background: #111827;
+  --color-foreground: #F3F4F6;
+  --color-muted: #9CA3AF;
+}
+
+.dark body,
+html.dark body {
+  background: #111827;
+  color: #F3F4F6;
+}
+
+/* Dark mode component overrides */
+.dark .bg-white {
+  background-color: #1F2937 !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: #374151 !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #1F2937 !important;
+}
+
+.dark .border-gray-200 {
+  border-color: #374151 !important;
+}
+
+.dark .border-gray-300 {
+  border-color: #4B5563 !important;
+}
+
+.dark .text-gray-300 {
+  color: #D1D5DB !important;
+}
+
+.dark .text-gray-400 {
+  color: #9CA3AF !important;
+}
+
+.dark .text-gray-500 {
+  color: #6B7280 !important;
+}
+
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Quiz & flashcard dark mode */
+.dark .bg-blue-50 {
+  background-color: #1e3a5f !important;
+}
+
+.dark .border-blue-200 {
+  border-color: #2563EB !important;
+}
+
+.dark .text-blue-800,
+.dark .text-blue-900 {
+  color: #93C5FD !important;
+}
+
+.dark .text-blue-700 {
+  color: #60A5FA !important;
+}
+
+.dark .bg-green-50 {
+  background-color: #064e3b !important;
+}
+
+.dark .border-green-200 {
+  border-color: #059669 !important;
+}
+
+.dark .bg-red-50 {
+  background-color: #450a0a !important;
+}
+
+.dark .border-red-200 {
+  border-color: #DC2626 !important;
+}
+
+.dark .bg-amber-50 {
+  background-color: #451a03 !important;
+}
+
+.dark .border-amber-500 {
+  border-color: #D97706 !important;
+}
+
+.dark .text-amber-900 {
+  color: #FCD34D !important;
+}
+
+.dark .bg-green-100 {
+  background-color: #064e3b !important;
+}
+
+.dark .text-green-800 {
+  color: #6EE7B7 !important;
+}
+
+/* Footer dark mode */
+.dark footer {
+  background-color: #030712 !important;
 }
 
 /* Flashcard 3D Flip */

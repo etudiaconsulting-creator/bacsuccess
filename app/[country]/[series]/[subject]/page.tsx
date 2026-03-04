@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { FileText, ArrowRight } from 'lucide-react'
+import { FileText, ArrowRight, CheckCircle2, ClipboardList } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
+import ProgressBar from '@/components/progress/ProgressBar'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { resolveFullPath } from '@/lib/data/resolvers'
+import { getChapterProgress } from '@/lib/progress'
 
 interface PageProps {
   params: Promise<{ country: string; series: string; subject: string }>
@@ -47,8 +49,15 @@ export default async function SubjectPage({ params }: PageProps) {
   const { country: countrySlug, series: seriesSlug, subject: subjectSlug } = await params
 
   const { country, series, subject, supabase } = await resolveFullPath({ country: countrySlug, series: seriesSlug, subject: subjectSlug })
+  const { data: { session } } = await supabase.auth.getSession()
+
   const { data: chaptersRaw } = await supabase
     .rpc('get_chapters_with_counts', { p_subject_id: subject.id })
+
+  // Fetch user progress if logged in
+  const progress = session?.user
+    ? await getChapterProgress(session.user.id, subject.id, supabase)
+    : {}
 
   const chapterList = ((chaptersRaw ?? []) as Array<{
     id: string; subject_id: string; slug: string; number: number;
@@ -88,6 +97,14 @@ export default async function SubjectPage({ params }: PageProps) {
             <p className="mt-2 text-muted">
               {chapterList.length} chapitre{chapterList.length !== 1 ? 's' : ''} disponible{chapterList.length !== 1 ? 's' : ''}
             </p>
+            <Link
+              href={`/${countrySlug}/${seriesSlug}/${subjectSlug}/exam`}
+              className="mt-4 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
+              style={{ backgroundColor: subjectColor }}
+            >
+              <ClipboardList className="h-4 w-4" />
+              Mode Examen
+            </Link>
           </div>
 
           <div className="flex flex-col gap-4 pb-12">
@@ -115,7 +132,21 @@ export default async function SubjectPage({ params }: PageProps) {
                   <div className="mt-2 flex items-center gap-1 text-xs text-muted">
                     <FileText className="h-3.5 w-3.5" />
                     <span>{chapter.ficheCount} fiche{chapter.ficheCount !== 1 ? 's' : ''}</span>
+                    {progress[chapter.id] && progress[chapter.id].viewedFiches === progress[chapter.id].totalFiches && progress[chapter.id].totalFiches > 0 && (
+                      <span className="ml-2 inline-flex items-center gap-1 text-green-600">
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        <span>Terminé</span>
+                      </span>
+                    )}
                   </div>
+                  {progress[chapter.id] && progress[chapter.id].viewedFiches > 0 && (
+                    <ProgressBar
+                      viewed={progress[chapter.id].viewedFiches}
+                      total={progress[chapter.id].totalFiches}
+                      color={subjectColor}
+                      avgScore={progress[chapter.id].avgQuizScore}
+                    />
+                  )}
                 </div>
                 <ArrowRight className="h-5 w-5 flex-shrink-0 text-muted transition-transform group-hover:translate-x-1 group-hover:text-primary" />
               </Link>
@@ -139,6 +170,11 @@ function getSubjectColor(colorKey: string): string {
     francais: '#0891B2',
     histgeo: '#CA8A04',
     anglais: '#4F46E5',
+    svt: '#059669',
+    physique: '#2563EB',
+    chimie: '#7C3AED',
+    ecm: '#CA8A04',
+    eps: '#EA580C',
   }
   return colors[colorKey] ?? '#6B7280'
 }

@@ -10,13 +10,22 @@ import {
   Globe,
   Languages,
   BookMarked,
+  Dna,
+  Zap,
+  FlaskConical,
+  Landmark,
+  Dumbbell,
+  PenLine,
+  Compass,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
+import ProgressBar from '@/components/progress/ProgressBar'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { resolveFullPath } from '@/lib/data/resolvers'
+import { getSubjectProgress } from '@/lib/progress'
 
 const ICON_MAP: Record<string, LucideIcon> = {
   TrendingUp,
@@ -27,6 +36,13 @@ const ICON_MAP: Record<string, LucideIcon> = {
   BookOpen,
   Globe,
   Languages,
+  Dna,
+  Zap,
+  FlaskConical,
+  Landmark,
+  Dumbbell,
+  PenLine,
+  Compass,
 }
 
 const SUBJECT_COLORS: Record<string, string> = {
@@ -38,6 +54,11 @@ const SUBJECT_COLORS: Record<string, string> = {
   francais: '#0891B2',
   histgeo: '#CA8A04',
   anglais: '#4F46E5',
+  svt: '#059669',
+  physique: '#2563EB',
+  chimie: '#7C3AED',
+  ecm: '#CA8A04',
+  eps: '#EA580C',
 }
 
 interface PageProps {
@@ -74,8 +95,15 @@ export default async function DashboardPage({ params }: PageProps) {
   const { country: countrySlug, series: seriesSlug } = await params
 
   const { country, series, supabase } = await resolveFullPath({ country: countrySlug, series: seriesSlug })
+  const { data: { session } } = await supabase.auth.getSession()
+
   const { data: subjectsRaw } = await supabase
     .rpc('get_subjects_with_counts', { p_series_id: series.id })
+
+  // Fetch user progress if logged in
+  const progress = session?.user
+    ? await getSubjectProgress(session.user.id, series.id, supabase)
+    : {}
 
   const subjectList = ((subjectsRaw ?? []) as Array<{
     id: string; series_id: string; slug: string; name: string;
@@ -148,6 +176,14 @@ export default async function DashboardPage({ params }: PageProps) {
                       <span>{subject.chapterCount} chapitre{subject.chapterCount !== 1 ? 's' : ''}</span>
                       <span>{subject.ficheCount} fiche{subject.ficheCount !== 1 ? 's' : ''}</span>
                     </div>
+                    {progress[subject.id] && progress[subject.id].viewedFiches > 0 && (
+                      <ProgressBar
+                        viewed={progress[subject.id].viewedFiches}
+                        total={progress[subject.id].totalFiches}
+                        color={subjectColor}
+                        avgScore={progress[subject.id].avgQuizScore}
+                      />
+                    )}
                   </div>
                 </Link>
               )

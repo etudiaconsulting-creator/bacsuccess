@@ -1,14 +1,17 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { Lightbulb, HelpCircle, MessageCircle, Layers } from 'lucide-react'
 import type { QuizQuestion } from '@/lib/supabase/types'
 import FormulaText from '@/components/ui/FormulaText'
+import { updateQuizScore } from '@/lib/progress'
+import { trackEvent } from '@/lib/analytics'
 
 interface QuizPlayerProps {
   questions: QuizQuestion[]
   ficheTitle?: string
+  ficheId?: string
 }
 
 function getScoreMessage(percentage: number): string {
@@ -48,7 +51,7 @@ function shuffleQuestions(questions: QuizQuestion[]): QuizQuestion[] {
   })
 }
 
-export default function QuizPlayer({ questions, ficheTitle }: QuizPlayerProps) {
+export default function QuizPlayer({ questions, ficheTitle, ficheId }: QuizPlayerProps) {
   const pathname = usePathname()
   const [shuffledQuestions, setShuffledQuestions] = useState(() => shuffleQuestions(questions))
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -56,6 +59,7 @@ export default function QuizPlayer({ questions, ficheTitle }: QuizPlayerProps) {
   const [showResult, setShowResult] = useState(false)
   const [score, setScore] = useState(0)
   const [isFinished, setIsFinished] = useState(false)
+  const scoreSavedRef = useRef(false)
 
   const totalQuestions = shuffledQuestions.length
   const currentQuestion = shuffledQuestions[currentIndex]
@@ -80,6 +84,17 @@ export default function QuizPlayer({ questions, ficheTitle }: QuizPlayerProps) {
       setShowResult(false)
     } else {
       setIsFinished(true)
+      // Save quiz score — score is already updated by handleSelect
+      const pct = Math.round((score / totalQuestions) * 100)
+      trackEvent('quiz_completed', {
+        score: pct,
+        title: ficheTitle ?? '',
+        total_questions: totalQuestions,
+      })
+      if (ficheId && !scoreSavedRef.current) {
+        scoreSavedRef.current = true
+        updateQuizScore(ficheId, pct)
+      }
     }
   }
 
@@ -90,6 +105,7 @@ export default function QuizPlayer({ questions, ficheTitle }: QuizPlayerProps) {
     setShowResult(false)
     setScore(0)
     setIsFinished(false)
+    scoreSavedRef.current = false
   }, [questions])
 
   function getButtonStyle(optionIndex: number): string {
