@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { resolveCountry } from '@/lib/data/resolvers'
 
 interface PageProps {
   params: Promise<{ country: string }>
@@ -33,18 +33,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CountryPage({ params }: PageProps) {
   const { country: countrySlug } = await params
+
+  const country = await resolveCountry(countrySlug)
+
   const supabase = await createServerSupabaseClient()
-
-  const { data: country } = await supabase
-    .from('countries')
-    .select('*')
-    .eq('slug', countrySlug)
-    .single()
-
-  if (!country) {
-    notFound()
-  }
-
   const { data: seriesList } = await supabase
     .from('series')
     .select('*')

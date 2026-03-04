@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
 import FicheTabs from '@/components/fiche/FicheTabs'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { resolveCountry, resolveSeries, resolveSubject, resolveChapter, resolveFiche } from '@/lib/data/resolvers'
 
 interface PageProps {
   params: Promise<{
@@ -19,7 +19,6 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const {
     country: countrySlug,
-    series: seriesSlug,
     subject: subjectSlug,
     chapter: chapterSlug,
     fiche: ficheSlug,
@@ -38,7 +37,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     .eq('slug', subjectSlug)
     .single()
 
-  // To find the fiche, we need to resolve the chapter first
   const { data: chapter } = await supabase
     .from('chapters')
     .select('*')
@@ -75,62 +73,12 @@ export default async function FichePage({ params }: PageProps) {
     chapter: chapterSlug,
     fiche: ficheSlug,
   } = await params
-  const supabase = await createServerSupabaseClient()
 
-  const { data: country } = await supabase
-    .from('countries')
-    .select('*')
-    .eq('slug', countrySlug)
-    .single()
-
-  if (!country) {
-    notFound()
-  }
-
-  const { data: series } = await supabase
-    .from('series')
-    .select('*')
-    .eq('slug', seriesSlug)
-    .eq('country_id', country.id)
-    .single()
-
-  if (!series) {
-    notFound()
-  }
-
-  const { data: subject } = await supabase
-    .from('subjects')
-    .select('*')
-    .eq('slug', subjectSlug)
-    .eq('series_id', series.id)
-    .single()
-
-  if (!subject) {
-    notFound()
-  }
-
-  const { data: chapter } = await supabase
-    .from('chapters')
-    .select('*')
-    .eq('slug', chapterSlug)
-    .eq('subject_id', subject.id)
-    .single()
-
-  if (!chapter) {
-    notFound()
-  }
-
-  const { data: fiche } = await supabase
-    .from('fiches')
-    .select('*')
-    .eq('slug', ficheSlug)
-    .eq('chapter_id', chapter.id)
-    .eq('is_published', true)
-    .single()
-
-  if (!fiche) {
-    notFound()
-  }
+  const country = await resolveCountry(countrySlug)
+  const series = await resolveSeries(country.id, seriesSlug)
+  const subject = await resolveSubject(series.id, subjectSlug)
+  const chapter = await resolveChapter(subject.id, chapterSlug)
+  const fiche = await resolveFiche(chapter.id, ficheSlug)
 
   const { flashcards, schema, quiz } = fiche.content
 

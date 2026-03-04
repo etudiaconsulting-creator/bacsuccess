@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import { FileText, ArrowRight } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { resolveCountry, resolveSeries, resolveSubject } from '@/lib/data/resolvers'
 
 interface PageProps {
   params: Promise<{ country: string; series: string; subject: string }>
@@ -45,40 +45,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function SubjectPage({ params }: PageProps) {
   const { country: countrySlug, series: seriesSlug, subject: subjectSlug } = await params
+
+  const country = await resolveCountry(countrySlug)
+  const series = await resolveSeries(country.id, seriesSlug)
+  const subject = await resolveSubject(series.id, subjectSlug)
+
   const supabase = await createServerSupabaseClient()
-
-  const { data: country } = await supabase
-    .from('countries')
-    .select('*')
-    .eq('slug', countrySlug)
-    .single()
-
-  if (!country) {
-    notFound()
-  }
-
-  const { data: series } = await supabase
-    .from('series')
-    .select('*')
-    .eq('slug', seriesSlug)
-    .eq('country_id', country.id)
-    .single()
-
-  if (!series) {
-    notFound()
-  }
-
-  const { data: subject } = await supabase
-    .from('subjects')
-    .select('*')
-    .eq('slug', subjectSlug)
-    .eq('series_id', series.id)
-    .single()
-
-  if (!subject) {
-    notFound()
-  }
-
   const { data: chaptersRaw } = await supabase
     .rpc('get_chapters_with_counts', { p_subject_id: subject.id })
 

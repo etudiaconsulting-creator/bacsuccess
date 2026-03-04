@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import { Lock, Unlock, BookOpen } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { resolveCountry, resolveSeries, resolveSubject, resolveChapter } from '@/lib/data/resolvers'
 
 interface PageProps {
   params: Promise<{ country: string; series: string; subject: string; chapter: string }>
@@ -51,51 +51,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ChapterPage({ params }: PageProps) {
   const { country: countrySlug, series: seriesSlug, subject: subjectSlug, chapter: chapterSlug } = await params
+
+  const country = await resolveCountry(countrySlug)
+  const series = await resolveSeries(country.id, seriesSlug)
+  const subject = await resolveSubject(series.id, subjectSlug)
+  const chapter = await resolveChapter(subject.id, chapterSlug)
+
   const supabase = await createServerSupabaseClient()
-
-  const { data: country } = await supabase
-    .from('countries')
-    .select('*')
-    .eq('slug', countrySlug)
-    .single()
-
-  if (!country) {
-    notFound()
-  }
-
-  const { data: series } = await supabase
-    .from('series')
-    .select('*')
-    .eq('slug', seriesSlug)
-    .eq('country_id', country.id)
-    .single()
-
-  if (!series) {
-    notFound()
-  }
-
-  const { data: subject } = await supabase
-    .from('subjects')
-    .select('*')
-    .eq('slug', subjectSlug)
-    .eq('series_id', series.id)
-    .single()
-
-  if (!subject) {
-    notFound()
-  }
-
-  const { data: chapter } = await supabase
-    .from('chapters')
-    .select('*')
-    .eq('slug', chapterSlug)
-    .eq('subject_id', subject.id)
-    .single()
-
-  if (!chapter) {
-    notFound()
-  }
-
   const { data: fiches } = await supabase
     .from('fiches')
     .select('*')
