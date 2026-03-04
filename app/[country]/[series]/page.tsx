@@ -20,6 +20,7 @@ import {
   Users,
   ScrollText,
   Globe2,
+  Ruler,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import Header from '@/components/layout/Header'
@@ -49,6 +50,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Users,
   ScrollText,
   Globe2,
+  Ruler,
 }
 
 const SUBJECT_COLORS: Record<string, string> = {
@@ -68,6 +70,7 @@ const SUBJECT_COLORS: Record<string, string> = {
   sociologie: '#8B5CF6',
   histoire: '#B45309',
   geographie: '#059669',
+  dessin: '#6B7280',
 }
 
 interface PageProps {

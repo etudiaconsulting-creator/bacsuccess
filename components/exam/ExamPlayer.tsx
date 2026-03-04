@@ -38,6 +38,7 @@ const SUBJECT_COLORS: Record<string, string> = {
   sociologie: '#8B5CF6',
   histoire: '#B45309',
   geographie: '#059669',
+  dessin: '#6B7280',
 }
 
 function shuffleArray<T>(arr: T[]): T[] {

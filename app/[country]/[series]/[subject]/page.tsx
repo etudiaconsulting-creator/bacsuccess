@@ -178,6 +178,7 @@ function getSubjectColor(colorKey: string): string {
     sociologie: '#8B5CF6',
     histoire: '#B45309',
     geographie: '#059669',
+    dessin: '#6B7280',
   }
   return colors[colorKey] ?? '#6B7280'
 }
