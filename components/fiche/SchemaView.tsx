@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
+import { Maximize2, X } from 'lucide-react'
 import type { SchemaContent, SchemaNode, SchemaEdge } from '@/lib/supabase/types'
 
 interface SchemaViewProps {
@@ -335,11 +336,10 @@ function renderEdge(
   )
 }
 
-// --- Main component ---
+// --- SVG Schema (desktop) ---
 
-export default function SchemaView({ schema }: SchemaViewProps) {
+function SvgSchema({ schema }: { schema: SchemaContent }) {
   const { layoutNodes, totalWidth, totalHeight, nodeMap } = useMemo(() => {
-    // Build layout nodes
     const nm: Record<string, LayoutNode> = {}
     for (const node of schema.nodes) {
       const { width, height, lines } = computeNodeSize(node)
@@ -356,7 +356,6 @@ export default function SchemaView({ schema }: SchemaViewProps) {
       }
     }
 
-    // Build and layout tree
     const tree = buildTree(schema.nodes, schema.edges)
     let tw = 800
     let th = 400
@@ -378,37 +377,208 @@ export default function SchemaView({ schema }: SchemaViewProps) {
   const viewBox = `${-padding} ${-padding} ${totalWidth + padding * 2} ${totalHeight + padding * 2}`
 
   return (
+    <div className="w-full overflow-x-auto">
+      <svg
+        width="100%"
+        viewBox={viewBox}
+        className="min-w-[400px] h-auto"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <marker
+            id="schema-arrow"
+            markerWidth="10"
+            markerHeight="7"
+            refX="9"
+            refY="3.5"
+            orient="auto"
+            markerUnits="strokeWidth"
+          >
+            <polygon points="0 0, 10 3.5, 0 7" fill="#9CA3AF" />
+          </marker>
+        </defs>
+
+        {schema.edges.map((edge, i) => renderEdge(edge, nodeMap, i))}
+        {layoutNodes.map((node) => renderNode(node))}
+      </svg>
+    </div>
+  )
+}
+
+// --- Mobile vertical layout ---
+
+interface MobileTreeNode {
+  id: string
+  node: SchemaNode
+  children: MobileTreeNode[]
+}
+
+function buildMobileTree(nodes: SchemaNode[], edges: SchemaEdge[]): MobileTreeNode | null {
+  if (nodes.length === 0) return null
+
+  const nodeById: Record<string, SchemaNode> = {}
+  const childrenMap: Record<string, string[]> = {}
+  const targetSet = new Set<string>()
+
+  for (const n of nodes) {
+    nodeById[n.id] = n
+    childrenMap[n.id] = []
+  }
+  for (const e of edges) {
+    if (childrenMap[e.from]) childrenMap[e.from].push(e.to)
+    targetSet.add(e.to)
+  }
+
+  let rootId = nodes.find((n) => n.type === 'main')?.id
+  if (!rootId) rootId = nodes.find((n) => !targetSet.has(n.id))?.id
+  if (!rootId) rootId = nodes[0].id
+
+  const edgeLabelMap: Record<string, string> = {}
+  for (const e of edges) {
+    if (e.label) edgeLabelMap[`${e.from}->${e.to}`] = e.label
+  }
+
+  const visited = new Set<string>()
+  function build(id: string): MobileTreeNode {
+    visited.add(id)
+    const kids = (childrenMap[id] || []).filter((cid) => !visited.has(cid))
+    return { id, node: nodeById[id], children: kids.map((cid) => build(cid)) }
+  }
+
+  const tree = build(rootId)
+  for (const n of nodes) {
+    if (!visited.has(n.id)) {
+      tree.children.push({ id: n.id, node: nodeById[n.id], children: [] })
+    }
+  }
+
+  return tree
+}
+
+function getEdgeLabel(edges: SchemaEdge[], fromId: string, toId: string): string | undefined {
+  return edges.find((e) => e.from === fromId && e.to === toId)?.label
+}
+
+function MobileSchema({ schema }: { schema: SchemaContent }) {
+  const tree = useMemo(() => buildMobileTree(schema.nodes, schema.edges), [schema])
+
+  if (!tree) return null
+
+  return (
+    <div className="space-y-4">
+      {/* Main node */}
+      <div className="rounded-xl bg-[#1B4332] px-5 py-4 text-center">
+        <p className="text-base font-bold text-white whitespace-pre-line">{tree.node.label}</p>
+      </div>
+
+      {/* Branch nodes */}
+      {tree.children.map((branch) => {
+        const edgeLabel = getEdgeLabel(schema.edges, tree.id, branch.id)
+        return (
+          <div key={branch.id}>
+            {edgeLabel && (
+              <div className="flex justify-center mb-2">
+                <span className="rounded-full bg-gray-100 px-3 py-0.5 text-xs text-gray-500">{edgeLabel}</span>
+              </div>
+            )}
+            <div className="rounded-xl border-2 border-amber-500 bg-amber-50 px-4 py-3">
+              <p className="font-semibold text-amber-900 whitespace-pre-line">{branch.node.label}</p>
+
+              {branch.children.length > 0 && (
+                <div className="mt-3 space-y-1.5 border-l-2 border-gray-300 pl-4 ml-1">
+                  {branch.children.map((leaf) => {
+                    const leafEdge = getEdgeLabel(schema.edges, branch.id, leaf.id)
+                    return (
+                      <div key={leaf.id}>
+                        {leafEdge && (
+                          <span className="text-[11px] text-gray-400 mb-0.5 block">{leafEdge}</span>
+                        )}
+                        <p className="text-sm text-gray-700 whitespace-pre-line">{leaf.node.label}</p>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// --- Fullscreen SVG modal ---
+
+function FullscreenModal({ schema, onClose }: { schema: SchemaContent; onClose: () => void }) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
+  return (
+    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+        <p className="text-sm font-semibold text-foreground">{schema.title}</p>
+        <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
+          <X className="h-5 w-5 text-gray-600" />
+        </button>
+      </div>
+      <div className="flex-1 overflow-auto" style={{ touchAction: 'manipulation' }}>
+        <div className="min-w-[600px] p-4">
+          <SvgSchema schema={schema} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// --- Main component ---
+
+export default function SchemaView({ schema }: SchemaViewProps) {
+  const [isMobile, setIsMobile] = useState(false)
+  const [showFullscreen, setShowFullscreen] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  if (schema.nodes.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="mb-4 h-12 w-12 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+        <h2 className="text-lg font-semibold text-foreground">Le schéma de synthèse sera bientôt disponible !</h2>
+      </div>
+    )
+  }
+
+  return (
     <div className="w-full">
       <h3 className="text-lg font-semibold text-foreground mb-6 text-center flex items-center justify-center gap-3">
         <span className="h-px w-12 bg-gray-300" />
         {schema.title}
         <span className="h-px w-12 bg-gray-300" />
       </h3>
-      <div className="w-full overflow-x-auto">
-        <svg
-          width="100%"
-          viewBox={viewBox}
-          className="min-w-[400px] h-auto"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <marker
-              id="schema-arrow"
-              markerWidth="10"
-              markerHeight="7"
-              refX="9"
-              refY="3.5"
-              orient="auto"
-              markerUnits="strokeWidth"
-            >
-              <polygon points="0 0, 10 3.5, 0 7" fill="#9CA3AF" />
-            </marker>
-          </defs>
 
-          {schema.edges.map((edge, i) => renderEdge(edge, nodeMap, i))}
-          {layoutNodes.map((node) => renderNode(node))}
-        </svg>
-      </div>
+      {isMobile ? (
+        <>
+          <MobileSchema schema={schema} />
+          <button
+            onClick={() => setShowFullscreen(true)}
+            className="mt-6 w-full flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-3 text-sm font-medium text-foreground hover:bg-gray-50 cursor-pointer"
+          >
+            <Maximize2 className="h-4 w-4" />
+            Voir le schéma complet
+          </button>
+          {showFullscreen && (
+            <FullscreenModal schema={schema} onClose={() => setShowFullscreen(false)} />
+          )}
+        </>
+      ) : (
+        <SvgSchema schema={schema} />
+      )}
     </div>
   )
 }
