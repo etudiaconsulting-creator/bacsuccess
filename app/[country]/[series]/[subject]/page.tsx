@@ -79,29 +79,17 @@ export default async function SubjectPage({ params }: PageProps) {
     notFound()
   }
 
-  const { data: chapters } = await supabase
-    .from('chapters')
-    .select('*')
-    .eq('subject_id', subject.id)
-    .order('number')
+  const { data: chaptersRaw } = await supabase
+    .rpc('get_chapters_with_counts', { p_subject_id: subject.id })
 
-  const chapterList = chapters ?? []
-
-  // Fetch fiche counts for each chapter
-  const chaptersWithCounts = await Promise.all(
-    chapterList.map(async (chapter) => {
-      const { count } = await supabase
-        .from('fiches')
-        .select('*', { count: 'exact', head: true })
-        .eq('chapter_id', chapter.id)
-        .eq('is_published', true)
-
-      return {
-        ...chapter,
-        ficheCount: count ?? 0,
-      }
-    })
-  )
+  const chapterList = ((chaptersRaw ?? []) as Array<{
+    id: string; subject_id: string; slug: string; number: number;
+    title: string; description: string | null; display_order: number;
+    created_at: string; fiche_count: number;
+  }>).map((c) => ({
+    ...c,
+    ficheCount: Number(c.fiche_count),
+  }))
 
   const subjectColor = subject.color ? getSubjectColor(subject.color) : '#6B7280'
 
@@ -130,12 +118,12 @@ export default async function SubjectPage({ params }: PageProps) {
               </h1>
             </div>
             <p className="mt-2 text-muted">
-              {chaptersWithCounts.length} chapitre{chaptersWithCounts.length !== 1 ? 's' : ''} disponible{chaptersWithCounts.length !== 1 ? 's' : ''}
+              {chapterList.length} chapitre{chapterList.length !== 1 ? 's' : ''} disponible{chapterList.length !== 1 ? 's' : ''}
             </p>
           </div>
 
           <div className="flex flex-col gap-4 pb-12">
-            {chaptersWithCounts.map((chapter) => (
+            {chapterList.map((chapter) => (
               <Link
                 key={chapter.id}
                 href={`/${countrySlug}/${seriesSlug}/${subjectSlug}/${chapter.slug}`}

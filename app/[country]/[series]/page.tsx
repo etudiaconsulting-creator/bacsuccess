@@ -95,45 +95,19 @@ export default async function DashboardPage({ params }: PageProps) {
     notFound()
   }
 
-  const { data: subjects } = await supabase
-    .from('subjects')
-    .select('*')
-    .eq('series_id', series.id)
-    .order('display_order')
+  const { data: subjectsRaw } = await supabase
+    .rpc('get_subjects_with_counts', { p_series_id: series.id })
 
-  const subjectList = subjects ?? []
-
-  // Fetch chapter and fiche counts for each subject
-  const subjectsWithCounts = await Promise.all(
-    subjectList.map(async (subject) => {
-      const { count: chapterCount } = await supabase
-        .from('chapters')
-        .select('*', { count: 'exact', head: true })
-        .eq('subject_id', subject.id)
-
-      const { data: chapters } = await supabase
-        .from('chapters')
-        .select('id')
-        .eq('subject_id', subject.id)
-
-      let ficheCount = 0
-      if (chapters && chapters.length > 0) {
-        const chapterIds = chapters.map((c) => c.id)
-        const { count } = await supabase
-          .from('fiches')
-          .select('*', { count: 'exact', head: true })
-          .in('chapter_id', chapterIds)
-          .eq('is_published', true)
-        ficheCount = count ?? 0
-      }
-
-      return {
-        ...subject,
-        chapterCount: chapterCount ?? 0,
-        ficheCount,
-      }
-    })
-  )
+  const subjectList = ((subjectsRaw ?? []) as Array<{
+    id: string; series_id: string; slug: string; name: string;
+    coefficient: number; hours_per_week: number | null; color: string | null;
+    icon: string | null; display_order: number; created_at: string;
+    chapter_count: number; fiche_count: number;
+  }>).map((s) => ({
+    ...s,
+    chapterCount: Number(s.chapter_count),
+    ficheCount: Number(s.fiche_count),
+  }))
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -158,7 +132,7 @@ export default async function DashboardPage({ params }: PageProps) {
           </div>
 
           <div className="grid grid-cols-1 gap-4 pb-12 sm:grid-cols-2 lg:grid-cols-3">
-            {subjectsWithCounts.map((subject) => {
+            {subjectList.map((subject) => {
               const colorKey = subject.color ?? ''
               const subjectColor = SUBJECT_COLORS[colorKey] ?? '#6B7280'
               const IconComponent = ICON_MAP[subject.icon ?? ''] ?? BookMarked
