@@ -29,18 +29,32 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const publicRoutes = ['/login', '/signup', '/auth/callback', '/auth/confirm', '/mali']
-  const isPublicRoute = publicRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
-  )
+  const pathname = request.nextUrl.pathname
 
-  if (!user && !isPublicRoute) {
+  // Public routes — always accessible
+  const isPublicRoute =
+    pathname === '/' ||
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname.startsWith('/auth/')
+
+  // Browse routes — country and series pages are public (no auth required)
+  // Pattern: /[country] or /[country]/[series] (exactly 1 or 2 segments)
+  const segments = pathname.split('/').filter(Boolean)
+  const isBrowseRoute = segments.length <= 2
+
+  // Content routes require auth: /[country]/[series]/[subject]/*
+  const isProtectedContent = segments.length >= 3
+
+  if (!user && !isPublicRoute && !isBrowseRoute && isProtectedContent) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
   }
 
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
+  // Redirect authenticated users away from auth pages
+  if (user && (pathname === '/login' || pathname === '/signup')) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
     return NextResponse.redirect(url)

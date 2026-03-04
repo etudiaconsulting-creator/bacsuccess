@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import AuthLayout from '@/components/auth/AuthLayout'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -33,7 +34,8 @@ export default function LoginPage() {
       return
     }
 
-    router.push('/')
+    const redirectTo = searchParams.get('redirect') || '/'
+    router.push(redirectTo)
     router.refresh()
   }
 
@@ -42,7 +44,6 @@ export default function LoginPage() {
       title="Content de te revoir !"
       subtitle="Connecte-toi pour accéder à tes fiches"
     >
-      {/* Card */}
       <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
         <form onSubmit={handleEmailLogin} className="space-y-4">
           {error && (
@@ -105,7 +106,6 @@ export default function LoginPage() {
         </form>
       </div>
 
-      {/* Signup link */}
       <p className="mt-6 text-center text-sm text-muted">
         Pas encore de compte ?{' '}
         <Link href="/signup" className="font-semibold text-primary hover:underline">
@@ -113,5 +113,13 @@ export default function LoginPage() {
         </Link>
       </p>
     </AuthLayout>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }
