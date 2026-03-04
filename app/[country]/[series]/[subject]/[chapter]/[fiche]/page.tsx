@@ -3,6 +3,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
 import FicheTabs from '@/components/fiche/FicheTabs'
+import WhatsAppShareFiche from '@/components/ui/WhatsAppShareFiche'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { resolveFullPath } from '@/lib/data/resolvers'
 
@@ -101,6 +102,9 @@ export default async function FichePage({ params }: PageProps) {
             {fiche.subtitle && (
               <p className="mt-2 text-muted">{fiche.subtitle}</p>
             )}
+            <div className="mt-4">
+              <WhatsAppShareFiche title={fiche.title} />
+            </div>
           </div>
 
           <div className="pb-12">
@@ -108,6 +112,7 @@ export default async function FichePage({ params }: PageProps) {
               flashcards={flashcards}
               schema={schema}
               questions={quiz}
+              ficheTitle={fiche.title}
             />
           </div>
         </div>

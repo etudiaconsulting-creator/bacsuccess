@@ -12,6 +12,7 @@ interface FicheTabsProps {
   flashcards: Flashcard[]
   schema: SchemaContent
   questions: QuizQuestion[]
+  ficheTitle?: string
 }
 
 type TabKey = 'flashcards' | 'schema' | 'quiz'
@@ -24,7 +25,7 @@ const TABS: { key: TabKey; label: string; icon: typeof Layers }[] = [
 
 const VALID_TABS = new Set<string>(['flashcards', 'schema', 'quiz'])
 
-function FicheTabsInner({ flashcards, schema, questions }: FicheTabsProps) {
+function FicheTabsInner({ flashcards, schema, questions, ficheTitle }: FicheTabsProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -66,7 +67,7 @@ function FicheTabsInner({ flashcards, schema, questions }: FicheTabsProps) {
       <div className="mt-6">
         {activeTab === 'flashcards' && <FlashcardGrid flashcards={flashcards} />}
         {activeTab === 'schema' && <SchemaView schema={schema} />}
-        {activeTab === 'quiz' && <QuizPlayer questions={questions} />}
+        {activeTab === 'quiz' && <QuizPlayer questions={questions} ficheTitle={ficheTitle} />}
       </div>
     </div>
   )

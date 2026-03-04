@@ -1,19 +1,23 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Lightbulb, HelpCircle } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { Lightbulb, HelpCircle, MessageCircle, Layers } from 'lucide-react'
 import type { QuizQuestion } from '@/lib/supabase/types'
 import FormulaText from '@/components/ui/FormulaText'
 
 interface QuizPlayerProps {
   questions: QuizQuestion[]
+  ficheTitle?: string
 }
 
 function getScoreMessage(percentage: number): string {
-  if (percentage === 100) return 'Excellent !'
-  if (percentage >= 70) return 'Bien joué !'
-  if (percentage >= 50) return 'Revois les fiches'
-  return 'Reprends depuis le début'
+  if (percentage === 100) return 'Parfait ! Tu maîtrises ce chapitre !'
+  if (percentage >= 80) return 'Excellent, continue comme ça !'
+  if (percentage >= 60) return 'Bon travail ! Revois quelques notions.'
+  if (percentage >= 40) return 'Tu progresses, continue à réviser !'
+  if (percentage >= 20) return 'Pas de panique, révise les flashcards et réessaie !'
+  return "C'est le début ! Commence par lire les flashcards, tu vas y arriver !"
 }
 
 function getScoreColor(percentage: number): string {
@@ -44,7 +48,8 @@ function shuffleQuestions(questions: QuizQuestion[]): QuizQuestion[] {
   })
 }
 
-export default function QuizPlayer({ questions }: QuizPlayerProps) {
+export default function QuizPlayer({ questions, ficheTitle }: QuizPlayerProps) {
+  const pathname = usePathname()
   const [shuffledQuestions, setShuffledQuestions] = useState(() => shuffleQuestions(questions))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
@@ -133,24 +138,47 @@ export default function QuizPlayer({ questions }: QuizPlayerProps) {
             {score} bonne{score > 1 ? 's' : ''} réponse{score > 1 ? 's' : ''} sur{' '}
             {totalQuestions}
           </p>
-          <button
-            onClick={handleRestart}
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary-light transition-colors cursor-pointer"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+          <div className="flex flex-col items-center gap-3">
+            <button
+              onClick={handleRestart}
+              className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary-light transition-colors cursor-pointer"
             >
-              <path
-                fillRule="evenodd"
-                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Recommencer
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Recommencer
+            </button>
+            {percentage < 60 && (
+              <a
+                href="?tab=flashcards"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-gray-200 bg-white text-foreground font-medium hover:bg-gray-50 transition-colors"
+              >
+                <Layers className="h-4 w-4" />
+                Revoir les flashcards
+              </a>
+            )}
+            {ficheTitle && (
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(`J'ai obtenu ${percentage}% au quiz "${ficheTitle}" sur BacSuccess ! Teste-toi aussi : https://bacsuccess.vercel.app${pathname}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-colors hover:opacity-90"
+                style={{ backgroundColor: '#25D366' }}
+              >
+                <MessageCircle className="h-4 w-4" />
+                Partager mon score
+              </a>
+            )}
+          </div>
         </div>
       </div>
     )
