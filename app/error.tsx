@@ -1,6 +1,7 @@
 'use client'
 
-import { GraduationCap, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
+import { GraduationCap, RefreshCw, Home } from 'lucide-react'
 
 export default function Error({
   reset,
@@ -13,18 +14,27 @@ export default function Error({
       <div className="text-center">
         <GraduationCap className="mx-auto h-16 w-16 text-secondary" />
         <h1 className="mt-6 font-serif text-3xl font-bold text-foreground">
-          Une erreur est survenue
+          Quelque chose s&apos;est mal passé
         </h1>
         <p className="mt-4 max-w-md text-muted">
-          Quelque chose s&apos;est mal passé. Réessaie dans quelques instants.
+          Une erreur inattendue est survenue. Réessaie dans quelques instants.
         </p>
-        <button
-          onClick={reset}
-          className="mt-8 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-light cursor-pointer"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Réessayer
-        </button>
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <button
+            onClick={reset}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-light cursor-pointer"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Réessayer
+          </button>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-3 font-semibold text-foreground transition-colors hover:bg-gray-50"
+          >
+            <Home className="h-4 w-4" />
+            Retour à l&apos;accueil
+          </Link>
+        </div>
       </div>
     </div>
   )

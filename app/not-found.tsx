@@ -1,17 +1,16 @@
 import Link from 'next/link'
-import { GraduationCap, Home } from 'lucide-react'
+import { BookOpen, Home } from 'lucide-react'
 
 export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
       <div className="text-center">
-        <GraduationCap className="mx-auto h-16 w-16 text-secondary" />
+        <BookOpen className="mx-auto h-16 w-16 text-secondary" />
         <h1 className="mt-6 font-serif text-4xl font-bold text-foreground">
-          Page introuvable
+          Oups ! Cette page n&apos;existe pas
         </h1>
         <p className="mt-4 max-w-md text-muted">
-          Oups, cette page n&apos;existe pas ou a été déplacée.
-          Retourne à l&apos;accueil pour continuer tes révisions.
+          La page que tu cherches a peut-être été déplacée ou n&apos;existe plus.
         </p>
         <Link
           href="/"
