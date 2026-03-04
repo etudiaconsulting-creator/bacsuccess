@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { RotateCcw } from 'lucide-react'
+import { RotateCcw, Layers } from 'lucide-react'
 import type { Flashcard } from '@/lib/supabase/types'
 import FormulaText from '@/components/ui/FormulaText'
 
@@ -246,10 +246,21 @@ function FlashcardCard({ card }: { card: Flashcard }) {
   const [flipped, setFlipped] = useState(false)
   const color = getCategoryColor(card.category)
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      setFlipped(!flipped)
+    }
+  }
+
   return (
     <div
-      className="perspective cursor-pointer group"
+      className="perspective cursor-pointer group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-xl"
       onClick={() => setFlipped(!flipped)}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-label={flipped ? 'Voir la question' : 'Révéler la réponse'}
     >
       <div
         className={`flip-card-inner min-h-[220px] ${flipped ? 'flipped' : ''}`}
@@ -276,7 +287,7 @@ function FlashcardCard({ card }: { card: Flashcard }) {
             </div>
             <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400 mt-4">
               <RotateCcw className="w-3 h-3" />
-              <span>Cliquer pour révéler</span>
+              <span>Révéler la réponse</span>
             </div>
           </div>
         </div>
@@ -310,10 +321,19 @@ function FlashcardCard({ card }: { card: Flashcard }) {
 }
 
 export default function FlashcardGrid({ flashcards }: FlashcardGridProps) {
+  if (flashcards.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center">
+        <Layers className="mb-4 h-12 w-12 text-muted" />
+        <h2 className="text-lg font-semibold text-foreground">Les flashcards arrivent bientôt pour ce chapitre !</h2>
+      </div>
+    )
+  }
+
   return (
     <div>
       <p className="text-sm text-muted mb-6">
-        {flashcards.length} flashcard{flashcards.length > 1 ? 's' : ''} — Clique sur une carte pour révéler la réponse
+        {flashcards.length} flashcard{flashcards.length > 1 ? 's' : ''} — Touche une carte pour révéler la réponse
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {flashcards.map((card) => (
