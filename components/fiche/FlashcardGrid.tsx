@@ -124,7 +124,7 @@ function renderRichText(text: string) {
 
     if (!rest) {
       return (
-        <strong className="font-semibold text-[#1A1A1A]">
+        <strong className="font-semibold text-foreground">
           {keyword}&thinsp;:
         </strong>
       )
@@ -133,7 +133,7 @@ function renderRichText(text: string) {
     if (isFormulaExpr(rest)) {
       return (
         <>
-          <strong className="font-semibold text-[#1A1A1A]">
+          <strong className="font-semibold text-foreground">
             {keyword}&thinsp;:
           </strong>{' '}
           <span className="bg-gray-100 px-1.5 py-0.5 rounded text-[14px] font-mono">
@@ -145,7 +145,7 @@ function renderRichText(text: string) {
 
     return (
       <>
-        <strong className="font-semibold text-[#1A1A1A]">
+        <strong className="font-semibold text-foreground">
           {keyword}&thinsp;:
         </strong>{' '}
         <FormulaText text={rest} />
@@ -207,7 +207,7 @@ function formatAnswer(text: string) {
       for (const item of chrono.dates) {
         elements.push(
           <div key={key++} className="flex gap-2 mb-2">
-            <strong className="font-semibold text-[#1A1A1A] shrink-0">
+            <strong className="font-semibold text-foreground shrink-0">
               {item.year}&thinsp;:
             </strong>
             <span><FormulaText text={item.text} /></span>
@@ -281,7 +281,7 @@ function FlashcardCard({ card }: { card: Flashcard }) {
               {card.category}
             </span>
             <div className="flex-1 flex items-center">
-              <p className="text-[17px] font-semibold text-[#1A1A1A] leading-relaxed">
+              <p className="text-[17px] font-semibold text-foreground leading-relaxed">
                 <FormulaText text={card.question} />
               </p>
             </div>
@@ -310,7 +310,7 @@ function FlashcardCard({ card }: { card: Flashcard }) {
             >
               {card.category}
             </span>
-            <div className="text-[15px] text-[#374151] leading-[1.6]">
+            <div className="text-[15px] text-foreground/80 leading-[1.6]">
               {formatAnswer(card.answer)}
             </div>
           </div>

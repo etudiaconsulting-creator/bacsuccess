@@ -4,13 +4,16 @@
       "Bash(npm install @supabase/supabase-js @supabase/ssr lucide-react)",
       "Bash(npx tsc --noEmit --pretty components/layout/Header.tsx components/layout/Breadcrumb.tsx components/layout/Footer.tsx)",
       "Bash(npm run build)",
-      "Bash(node -e \":*)",
       "Bash(npx supabase db push --help)",
       "Bash(npx supabase init --with-intellij-settings=false --force)",
-      "Bash(npx supabase db push --db-url \"postgresql://postgres.cxqpymuimljadznerayd:-MOhamedFAdma123%2B@aws-0-eu-west-3.pooler.supabase.com:6543/postgres\" --include-all)",
+      "Bash(npx supabase db push --db-url \"$DATABASE_URL\" --include-all)",
       "Bash(npx next build)",
       "Bash(python3 fix_accents.py)",
-      "Bash(python3 -c \":*)"
+      "Bash(git add supabase/migrations/002_add_count_functions.sql app/[country]/[series]/page.tsx app/[country]/[series]/[subject]/page.tsx)",
+      "Bash(git commit:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm run lint)",
+      "mcp__Claude_Preview__preview_start"
     ]
   }
 }

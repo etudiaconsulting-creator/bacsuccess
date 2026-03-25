@@ -29,7 +29,7 @@ export default async function HomePage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-primary px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+        <section className="relative overflow-hidden bg-primary dark:bg-[#0d2818] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-1.5 text-sm font-semibold text-primary">
               <GraduationCap className="h-4 w-4" />
@@ -76,7 +76,7 @@ export default async function HomePage() {
                   {country.is_active ? (
                     <Link
                       href={`/${country.slug}`}
-                      className="group flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-primary hover:shadow-md"
+                      className="group flex items-center gap-4 rounded-xl border border-gray-200 dark:border-emerald-500/25 bg-white p-6 shadow-sm transition-all hover:border-primary hover:shadow-md"
                     >
                       <span className="text-4xl">{country.flag_emoji}</span>
                       <div className="flex-1">

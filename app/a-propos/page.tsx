@@ -39,7 +39,7 @@ export default function AProposPage() {
       <Header />
 
       {/* Hero */}
-      <section className="bg-primary px-4 py-16 text-center text-white sm:py-20">
+      <section className="bg-primary dark:bg-[#0d2818] px-4 py-16 text-center text-white sm:py-20">
         <GraduationCap className="mx-auto h-12 w-12 text-secondary" />
         <h1 className="mt-4 font-serif text-3xl font-bold sm:text-4xl">
           Notre mission

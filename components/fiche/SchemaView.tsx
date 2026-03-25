@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState, useEffect } from 'react'
+import { useTheme } from 'next-themes'
 import { Maximize2, X } from 'lucide-react'
 import type { SchemaContent, SchemaNode, SchemaEdge } from '@/lib/supabase/types'
 
@@ -19,13 +20,29 @@ const MAX_WIDTH = 280
 const LEVEL_GAP_Y = 120
 const NODE_GAP_X = 40
 
-const NODE_STYLES: Record<
-  SchemaNode['type'],
-  { fill: string; stroke: string; textFill: string; fontSize: number; fontWeight: number }
-> = {
-  main: { fill: '#1B4332', stroke: '#1B4332', textFill: '#FFFFFF', fontSize: 16, fontWeight: 700 },
-  branch: { fill: '#FEF3C7', stroke: '#D97706', textFill: '#92400E', fontSize: 14, fontWeight: 600 },
-  leaf: { fill: '#FFFFFF', stroke: '#D1D5DB', textFill: '#1A1A1A', fontSize: 13, fontWeight: 400 },
+type NodeStyle = { fill: string; stroke: string; textFill: string; fontSize: number; fontWeight: number }
+
+function getNodeStyles(isDark: boolean): Record<SchemaNode['type'], NodeStyle> {
+  if (isDark) {
+    return {
+      main: { fill: '#1B4332', stroke: '#2D6A4F', textFill: '#FFFFFF', fontSize: 16, fontWeight: 700 },
+      branch: { fill: '#78350f', stroke: '#D97706', textFill: '#FCD34D', fontSize: 14, fontWeight: 600 },
+      leaf: { fill: '#1F2937', stroke: '#4B5563', textFill: '#F3F4F6', fontSize: 13, fontWeight: 400 },
+    }
+  }
+  return {
+    main: { fill: '#1B4332', stroke: '#1B4332', textFill: '#FFFFFF', fontSize: 16, fontWeight: 700 },
+    branch: { fill: '#FEF3C7', stroke: '#D97706', textFill: '#92400E', fontSize: 14, fontWeight: 600 },
+    leaf: { fill: '#FFFFFF', stroke: '#D1D5DB', textFill: '#1A1A1A', fontSize: 13, fontWeight: 400 },
+  }
+}
+
+function getEdgeColors(isDark: boolean) {
+  return {
+    stroke: isDark ? '#6B7280' : '#9CA3AF',
+    labelBg: isDark ? '#1F2937' : 'white',
+    labelText: isDark ? '#9CA3AF' : '#6B7280',
+  }
 }
 
 // --- Compute node dimensions based on text ---
@@ -237,8 +254,8 @@ function renderMultilineText(
   })
 }
 
-function renderNode(layoutNode: LayoutNode) {
-  const style = NODE_STYLES[layoutNode.type]
+function renderNode(layoutNode: LayoutNode, nodeStyles: Record<SchemaNode['type'], NodeStyle>) {
+  const style = nodeStyles[layoutNode.type]
   const rx = 8
   const halfW = layoutNode.width / 2
   const halfH = layoutNode.height / 2
@@ -280,7 +297,8 @@ function renderNode(layoutNode: LayoutNode) {
 function renderEdge(
   edge: SchemaEdge,
   nodeMap: Record<string, LayoutNode>,
-  index: number
+  index: number,
+  edgeColors: { stroke: string; labelBg: string; labelText: string }
 ) {
   const from = nodeMap[edge.from]
   const to = nodeMap[edge.to]
@@ -305,7 +323,7 @@ function renderEdge(
       <path
         d={d}
         fill="none"
-        stroke="#9CA3AF"
+        stroke={edgeColors.stroke}
         strokeWidth={1.5}
         markerEnd="url(#schema-arrow)"
       />
@@ -317,7 +335,7 @@ function renderEdge(
             width={edge.label.length * 7 + 12}
             height={18}
             rx={4}
-            fill="white"
+            fill={edgeColors.labelBg}
             fillOpacity={0.9}
           />
           <text
@@ -326,7 +344,7 @@ function renderEdge(
             textAnchor="middle"
             dominantBaseline="central"
             fontSize={11}
-            fill="#6B7280"
+            fill={edgeColors.labelText}
           >
             {edge.label}
           </text>
@@ -338,7 +356,9 @@ function renderEdge(
 
 // --- SVG Schema (desktop) ---
 
-function SvgSchema({ schema }: { schema: SchemaContent }) {
+function SvgSchema({ schema, isDark = false }: { schema: SchemaContent; isDark?: boolean }) {
+  const nodeStyles = getNodeStyles(isDark)
+  const edgeColors = getEdgeColors(isDark)
   const { layoutNodes, totalWidth, totalHeight, nodeMap } = useMemo(() => {
     const nm: Record<string, LayoutNode> = {}
     for (const node of schema.nodes) {
@@ -394,12 +414,12 @@ function SvgSchema({ schema }: { schema: SchemaContent }) {
             orient="auto"
             markerUnits="strokeWidth"
           >
-            <polygon points="0 0, 10 3.5, 0 7" fill="#9CA3AF" />
+            <polygon points="0 0, 10 3.5, 0 7" fill={edgeColors.stroke} />
           </marker>
         </defs>
 
-        {schema.edges.map((edge, i) => renderEdge(edge, nodeMap, i))}
-        {layoutNodes.map((node) => renderNode(node))}
+        {schema.edges.map((edge, i) => renderEdge(edge, nodeMap, i, edgeColors))}
+        {layoutNodes.map((node) => renderNode(node, nodeStyles))}
       </svg>
     </div>
   )
@@ -509,14 +529,14 @@ function MobileSchema({ schema }: { schema: SchemaContent }) {
 
 // --- Fullscreen SVG modal ---
 
-function FullscreenModal({ schema, onClose }: { schema: SchemaContent; onClose: () => void }) {
+function FullscreenModal({ schema, onClose, isDark }: { schema: SchemaContent; onClose: () => void; isDark: boolean }) {
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
   }, [])
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+    <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900 flex flex-col">
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
         <p className="text-sm font-semibold text-foreground">{schema.title}</p>
         <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
@@ -525,7 +545,7 @@ function FullscreenModal({ schema, onClose }: { schema: SchemaContent; onClose: 
       </div>
       <div className="flex-1 overflow-auto" style={{ touchAction: 'manipulation' }}>
         <div className="min-w-[600px] p-4">
-          <SvgSchema schema={schema} />
+          <SvgSchema schema={schema} isDark={isDark} />
         </div>
       </div>
     </div>
@@ -535,10 +555,14 @@ function FullscreenModal({ schema, onClose }: { schema: SchemaContent; onClose: 
 // --- Main component ---
 
 export default function SchemaView({ schema }: SchemaViewProps) {
+  const { theme } = useTheme()
   const [isMobile, setIsMobile] = useState(false)
   const [showFullscreen, setShowFullscreen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const isDark = mounted && theme === 'dark'
 
   useEffect(() => {
+    setMounted(true)
     const check = () => setIsMobile(window.innerWidth < 640)
     check()
     window.addEventListener('resize', check)
@@ -573,11 +597,11 @@ export default function SchemaView({ schema }: SchemaViewProps) {
             Voir le schéma complet
           </button>
           {showFullscreen && (
-            <FullscreenModal schema={schema} onClose={() => setShowFullscreen(false)} />
+            <FullscreenModal schema={schema} onClose={() => setShowFullscreen(false)} isDark={isDark} />
           )}
         </>
       ) : (
-        <SvgSchema schema={schema} />
+        <SvgSchema schema={schema} isDark={isDark} />
       )}
     </div>
   )

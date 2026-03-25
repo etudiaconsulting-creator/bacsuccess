@@ -39,7 +39,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
   return (
     <div className="flex min-h-screen bg-background">
       {/* Left — Benefits */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center bg-primary px-12 xl:px-20">
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center bg-primary dark:bg-[#0d2818] px-12 xl:px-20">
         <div className="max-w-lg">
           <div className="inline-flex items-center gap-2 mb-6">
             <GraduationCap className="h-10 w-10 text-secondary" />
@@ -77,7 +77,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
           <div className="mb-8 text-center lg:hidden">
             <div className="inline-flex items-center gap-2">
               <GraduationCap className="h-8 w-8 text-secondary" />
-              <span className="font-serif text-2xl font-bold text-primary">
+              <span className="font-serif text-2xl font-bold text-primary dark:text-emerald-400">
                 BacSuccess
               </span>
             </div>

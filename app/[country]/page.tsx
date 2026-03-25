@@ -76,7 +76,7 @@ export default async function CountryPage({ params }: PageProps) {
                     className="group flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-primary hover:shadow-md"
                   >
                     <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-bold text-primary">
+                      <h2 className="text-xl font-bold text-primary dark:text-emerald-400">
                         {s.short_name}
                       </h2>
                       <ArrowRight className="h-5 w-5 text-muted transition-transform group-hover:translate-x-1 group-hover:text-primary" />

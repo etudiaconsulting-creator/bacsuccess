@@ -60,7 +60,7 @@ function SignupForm() {
             </p>
           </div>
           <p className="mt-6 text-sm text-muted">
-            <Link href="/login" className="font-semibold text-primary hover:underline">
+            <Link href="/login" className="font-semibold text-primary dark:text-emerald-400 hover:underline">
               Retour à la connexion
             </Link>
           </p>
@@ -140,7 +140,7 @@ function SignupForm() {
       {/* Login link */}
       <p className="mt-6 text-center text-sm text-muted">
         Déjà un compte ?{' '}
-        <Link href="/login" className="font-semibold text-primary hover:underline">
+        <Link href="/login" className="font-semibold text-primary dark:text-emerald-400 hover:underline">
           Se connecter
         </Link>
       </p>

@@ -3,7 +3,7 @@ import { GraduationCap } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-primary dark:bg-gray-950">
+    <footer className="bg-primary">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="flex items-center gap-2">

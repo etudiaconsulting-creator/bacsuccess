@@ -2,7 +2,7 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme inline {
+@theme {
   --color-primary: #1B4332;
   --color-primary-light: #2D6A4F;
   --color-secondary: #D4A017;
@@ -39,124 +39,122 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
-/* Dark mode overrides */
+/* ==========================================================
+   DARK MODE
+   Body        #0f1419
+   Surface     #1c2333  (cards, panels)
+   Elevated    #232d3f  (hover, raised)
+   Inset       #151c28  (recessed: tab bars, inputs)
+   Footer      #0a0f14
+   Text        #e2e8f0 primary · #94a3b8 secondary · #64748b tertiary
+   Border      rgba(255,255,255, .08 / .12 / .20)
+   ========================================================== */
+
 .dark {
-  --color-background: #111827;
-  --color-foreground: #F3F4F6;
-  --color-muted: #9CA3AF;
+  --color-background: #0f1419;
+  --color-foreground: #e2e8f0;
+  --color-muted: #94a3b8;
 }
 
-.dark body,
 html.dark body {
-  background: #111827;
-  color: #F3F4F6;
+  background: #0f1419;
+  color: #e2e8f0;
 }
 
-/* Dark mode component overrides */
-.dark .bg-white {
-  background-color: #1F2937 !important;
-}
+/* --- Surfaces --- */
+.dark .bg-white    { background-color: #1c2333 !important; }
+.dark .bg-gray-50  { background-color: #151c28 !important; }
+.dark .bg-gray-100 { background-color: #151c28 !important; }
+.dark .bg-gray-200 { background-color: #232d3f !important; }
 
-.dark .bg-gray-100 {
-  background-color: #374151 !important;
-}
+/* --- Borders --- */
+.dark .border-gray-200 { border-color: rgba(255, 255, 255, 0.08) !important; }
+.dark .border-gray-300 { border-color: rgba(255, 255, 255, 0.12) !important; }
 
-.dark .bg-gray-50 {
-  background-color: #1F2937 !important;
-}
+/* --- Text hierarchy --- */
+.dark .text-gray-200 { color: #e2e8f0 !important; }
+.dark .text-gray-300 { color: #cbd5e1 !important; }
+.dark .text-gray-400 { color: #94a3b8 !important; }
+.dark .text-gray-500 { color: #64748b !important; }
+.dark .text-gray-600 { color: #94a3b8 !important; }
+.dark .text-gray-700 { color: #cbd5e1 !important; }
 
-.dark .border-gray-200 {
-  border-color: #374151 !important;
-}
+/* --- Shadows (subtle ring + soft drop) --- */
+.dark .shadow-sm { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 1px 2px rgba(0, 0, 0, 0.5) !important; }
+.dark .shadow-md { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 4px 12px rgba(0, 0, 0, 0.5) !important; }
+.dark .shadow-lg { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.6) !important; }
 
-.dark .border-gray-300 {
-  border-color: #4B5563 !important;
-}
+/* --- Red (stats, errors — subtle bg, vivid text) --- */
+.dark .bg-red-50      { background-color: rgba(239, 68, 68, 0.10) !important; }
+.dark .border-red-200 { border-color: rgba(239, 68, 68, 0.20) !important; }
+.dark .border-red-500 { border-color: #ef4444 !important; }
+.dark .text-red-500   { color: #f87171 !important; }
+.dark .text-red-600   { color: #f87171 !important; }
+.dark .text-red-700   { color: #fca5a5 !important; }
+.dark .text-red-800   { color: #fca5a5 !important; }
 
-.dark .text-gray-300 {
-  color: #D1D5DB !important;
-}
+/* --- Green (stats, success — subtle bg, vivid text) --- */
+.dark .bg-green-50      { background-color: rgba(34, 197, 94, 0.10) !important; }
+.dark .bg-green-100     { background-color: rgba(34, 197, 94, 0.12) !important; }
+.dark .border-green-200 { border-color: rgba(34, 197, 94, 0.20) !important; }
+.dark .border-green-500 { border-color: #22c55e !important; }
+.dark .text-green-600   { color: #4ade80 !important; }
+.dark .text-green-700   { color: #86efac !important; }
+.dark .text-green-800   { color: #86efac !important; }
 
-.dark .text-gray-400 {
-  color: #9CA3AF !important;
-}
-
-.dark .text-gray-500 {
-  color: #6B7280 !important;
-}
-
-.dark .shadow-sm {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) !important;
-}
-
-.dark .shadow-md {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
-}
-
-.dark .shadow-lg {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Quiz & flashcard dark mode */
-.dark .bg-blue-50 {
-  background-color: #1e3a5f !important;
-}
-
-.dark .border-blue-200 {
-  border-color: #2563EB !important;
-}
-
+/* --- Blue (quiz explanations) --- */
+.dark .bg-blue-50      { background-color: rgba(59, 130, 246, 0.10) !important; }
+.dark .border-blue-200 { border-color: rgba(59, 130, 246, 0.20) !important; }
+.dark .text-blue-600   { color: #60a5fa !important; }
+.dark .text-blue-700   { color: #60a5fa !important; }
 .dark .text-blue-800,
-.dark .text-blue-900 {
-  color: #93C5FD !important;
+.dark .text-blue-900   { color: #93c5fd !important; }
+
+/* --- Amber (badges, flags) --- */
+.dark .bg-amber-50      { background-color: rgba(245, 158, 11, 0.08) !important; }
+.dark .bg-amber-100     { background-color: rgba(245, 158, 11, 0.12) !important; }
+.dark .border-amber-500 { border-color: rgba(245, 158, 11, 0.30) !important; }
+.dark .text-amber-500   { color: #f59e0b !important; }
+.dark .text-amber-600   { color: #fbbf24 !important; }
+.dark .text-amber-900   { color: #fcd34d !important; }
+
+/* --- Orange --- */
+.dark .text-orange-500 { color: #fb923c !important; }
+
+/* --- Primary color adjustments (hover / focus states) --- */
+.dark .hover\:text-primary:hover,
+.dark .group-hover\:text-primary:hover { color: #34D399 !important; }
+.dark .hover\:border-primary:hover     { border-color: #2D6A4F !important; }
+.dark .focus\:border-primary:focus     { border-color: #2D6A4F !important; }
+
+/* --- Hover surfaces --- */
+.dark .hover\:bg-gray-50:hover     { background-color: #1c2333 !important; }
+.dark .hover\:bg-gray-200:hover    { background-color: #232d3f !important; }
+.dark .hover\:bg-amber-50:hover    { background-color: rgba(245, 158, 11, 0.08) !important; }
+.dark .hover\:border-gray-300:hover { border-color: rgba(255, 255, 255, 0.20) !important; }
+
+/* --- Header (specificity: 0-2-1 to override .dark .shadow-md) --- */
+.dark header.sticky {
+  background-color: #0f1419 !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) !important;
 }
 
-.dark .text-blue-700 {
-  color: #60A5FA !important;
-}
-
-.dark .bg-green-50 {
-  background-color: #064e3b !important;
-}
-
-.dark .border-green-200 {
-  border-color: #059669 !important;
-}
-
-.dark .bg-red-50 {
-  background-color: #450a0a !important;
-}
-
-.dark .border-red-200 {
-  border-color: #DC2626 !important;
-}
-
-.dark .bg-amber-50 {
-  background-color: #451a03 !important;
-}
-
-.dark .border-amber-500 {
-  border-color: #D97706 !important;
-}
-
-.dark .text-amber-900 {
-  color: #FCD34D !important;
-}
-
-.dark .bg-green-100 {
-  background-color: #064e3b !important;
-}
-
-.dark .text-green-800 {
-  color: #6EE7B7 !important;
-}
-
-/* Footer dark mode */
+/* --- Footer --- */
 .dark footer {
-  background-color: #030712 !important;
+  background-color: #0a0f14 !important;
+  color: #94a3b8;
 }
 
-/* Flashcard 3D Flip */
+/* --- Smooth theme switching --- */
+body,
+header,
+footer {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ============================================
+   Flashcard 3D Flip
+   ============================================ */
 .perspective {
   perspective: 1200px;
 }
