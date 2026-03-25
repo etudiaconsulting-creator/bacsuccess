@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Header from '@/components/layout/Header'
+import Header from '@/components/layout/AuthHeader'
 import Footer from '@/components/layout/Footer'
 import HeroSection from '@/components/landing/HeroSection'
 import FeaturesGrid from '@/components/landing/FeaturesGrid'

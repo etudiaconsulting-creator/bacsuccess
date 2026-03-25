@@ -35,7 +35,7 @@ function LoginForm() {
     }
 
     const redirect = searchParams.get('redirect')
-    const safeDest = redirect && redirect.startsWith('/') ? redirect : '/'
+    const safeDest = redirect && redirect.startsWith('/') ? redirect : '/mali'
     router.push(safeDest)
     router.refresh()
   }
