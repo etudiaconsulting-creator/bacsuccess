@@ -24,7 +24,7 @@ import {
   MessageCircle,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import Header from '@/components/layout/Header'
+import Header from '@/components/layout/AuthHeader'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
 import ProgressBar from '@/components/progress/ProgressBar'

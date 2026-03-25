@@ -1,4 +1,5 @@
-import { GraduationCap, BookOpen, Brain, Target, CheckCircle, Layers } from 'lucide-react'
+import Link from 'next/link'
+import { GraduationCap, BookOpen, Brain, Target, CheckCircle, Layers, ArrowLeft } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 const benefits: { icon: LucideIcon; title: string; description: string }[] = [
@@ -25,7 +26,7 @@ const benefits: { icon: LucideIcon; title: string; description: string }[] = [
   {
     icon: CheckCircle,
     title: 'Programme officiel du Bac',
-    description: 'Contenu aligné sur le programme TSECO du Bac malien',
+    description: 'Contenu aligné sur le programme officiel du baccalauréat',
   },
 ]
 
@@ -39,30 +40,36 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
   return (
     <div className="flex min-h-screen bg-background">
       {/* Left — Benefits */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center bg-primary dark:bg-[#0d2818] px-12 xl:px-20">
-        <div className="max-w-lg">
-          <div className="inline-flex items-center gap-2 mb-6">
-            <GraduationCap className="h-10 w-10 text-secondary" />
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center bg-gradient-to-br from-emerald-600 via-teal-700 to-emerald-900 px-12 xl:px-20 relative overflow-hidden">
+        {/* Decorative shapes */}
+        <div className="absolute top-10 left-10 w-64 h-64 bg-emerald-400 rounded-full opacity-10 blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-amber-400 rounded-full opacity-5 blur-3xl" />
+
+        <div className="relative z-10 max-w-lg">
+          <Link href="/" className="inline-flex items-center gap-2 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+              <GraduationCap className="h-6 w-6 text-white" />
+            </div>
             <span className="font-serif text-3xl font-bold text-white">
               BacSuccess
             </span>
-          </div>
+          </Link>
           <h1 className="font-serif text-3xl xl:text-4xl font-bold text-white leading-tight mb-4">
             Réussis ton Bac avec des fiches de révision interactives
           </h1>
-          <p className="text-white/70 text-lg mb-10">
-            La plateforme gratuite pour les élèves de Terminale au Mali.
+          <p className="text-emerald-100 text-lg mb-10">
+            La plateforme gratuite pour les élèves de Terminale en Afrique de l'Ouest.
           </p>
 
           <div className="space-y-5">
             {benefits.map((b) => (
               <div key={b.title} className="flex items-start gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                  <b.icon className="h-5 w-5 text-secondary" />
+                  <b.icon className="h-5 w-5 text-amber-300" />
                 </div>
                 <div>
                   <p className="font-semibold text-white">{b.title}</p>
-                  <p className="text-sm text-white/60">{b.description}</p>
+                  <p className="text-sm text-emerald-100/70">{b.description}</p>
                 </div>
               </div>
             ))}
@@ -73,11 +80,22 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
       {/* Right — Form */}
       <div className="flex w-full lg:w-1/2 flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
+          {/* Back to home */}
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-8"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Retour à l'accueil
+          </Link>
+
           {/* Mobile logo */}
           <div className="mb-8 text-center lg:hidden">
             <div className="inline-flex items-center gap-2">
-              <GraduationCap className="h-8 w-8 text-secondary" />
-              <span className="font-serif text-2xl font-bold text-primary dark:text-emerald-400">
+              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-serif text-2xl font-bold text-foreground">
                 BacSuccess
               </span>
             </div>

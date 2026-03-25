@@ -1,4 +1,4 @@
-import Header from '@/components/layout/Header'
+import Header from '@/components/layout/AuthHeader'
 
 export default function ChapterLoading() {
   return (

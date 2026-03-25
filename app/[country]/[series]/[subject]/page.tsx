@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { FileText, ArrowRight, CheckCircle2, ClipboardList } from 'lucide-react'
-import Header from '@/components/layout/Header'
+import Header from '@/components/layout/AuthHeader'
 import Footer from '@/components/layout/Footer'
 import Breadcrumb from '@/components/layout/Breadcrumb'
 import ProgressBar from '@/components/progress/ProgressBar'

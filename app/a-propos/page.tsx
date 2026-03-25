@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Mail, ExternalLink, GraduationCap } from 'lucide-react'
-import Header from '@/components/layout/Header'
+import Header from '@/components/layout/AuthHeader'
 import Footer from '@/components/layout/Footer'
 import TeamPhoto from '@/components/ui/TeamPhoto'
 
